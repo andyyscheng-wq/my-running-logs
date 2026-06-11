@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>個人跑步日誌 & 賽事目標控制台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#0086DB', // 專業科技藍
+                        brandDark: '#006cb3',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen pb-12">
+
+    <nav class="bg-brand text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-wide">🏃‍♂️ PR Target Dashboard</h1>
+            <span class="text-sm bg-white/20 px-3 py-1 rounded-full">每日訓練看板</span>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div class="md:col-span-1 space-y-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Target Race / 目標賽事</h2>
+                <div class="text-xl font-bold text-gray-800" id="displayRaceName">載入中...</div>
+                <div class="text-sm text-gray-500 mt-1" id="displayRaceGoal">目標：--</div>
+                
+                <div class="mt-4 bg-blue-50 p-4 rounded-xl text-center">
+                    <span class="block text-xs text-brand font-semibold">賽事倒數</span>
+                    <span class="text-3xl font-black text-brand" id="countdownDays">--</span>
+                    <span class="text-xs text-brand font-semibold"> 天</span>
+                </div>
+                
+                <button onclick="toggleModal('raceModal', true)" class="w-full mt-4 text-xs text-center text-gray-400 hover:text-brand transition">⚙️ 設定賽事目標</button>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Weekly Volume / 本週跑量</h2>
+                    <button onclick="setWeeklyGoal()" class="text-xs text-brand hover:underline">設定目標</button>
+                </div>
+                <div class="flex items-baseline space-x-1">
+                    <span class="text-3xl font-bold" id="currentWeeklyVolume">0</span>
+                    <span class="text-gray-500 text-sm">/ <span id="targetWeeklyVolume">50</span> km</span>
+                </div>
+                <div class="w-full bg-gray-100 h-3 rounded-full mt-3 overflow-hidden">
+                    <div id="weeklyProgressBar" class="bg-brand h-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="md:col-span-2 space-y-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span class="text-xl">📝</span> 紀錄今日訓練
+                </h2>
+                <form id="runForm" onsubmit="saveLog(event)" class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2 sm:col-span-1">
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">訓練日期</label>
+                        <input type="date" id="runDate" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand">
+                    </div>
+                    <div class="col-span-2 sm:col-span-1">
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">訓練類型</label>
+                        <select id="runType" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand">
+                            <option value="輕鬆跑">E 輕鬆跑</option>
+                            <option value="配速跑">M 配速跑</option>
+                            <option value="間歇跑">I 間歇跑</option>
+                            <option value="長距離(LSD)">LSD 長距離</option>
+                            <option value="越野跑">T 越野跑 / 縱走</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">里程 (km)</label>
+                        <input type="number" step="0.01" id="runDistance" placeholder="例如: 10" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">平均配速 (分'秒")</label>
+                        <input type="text" id="runPace" placeholder="例如: 5'10" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">體感與備忘錄 (自覺強度、肌肉狀況等)</label>
+                        <input type="text" id="runNotes" placeholder="例如：核心穩定度佳，體感輕鬆 / 左側小腿稍緊" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand">
+                    </div>
+                    <div class="col-span-2 mt-2">
+                        <button type="submit" class="w-full bg-brand hover:bg-brandDark text-white font-semibold p-3 rounded-xl shadow-sm transition">儲存訓練日誌</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-5 border-b border-gray-100 flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <span class="text-xl">📊</span> 歷史訓練日誌
+                    </h2>
+                    <button onclick="clearAllLogs()" class="text-xs text-red-400 hover:text-red-600">清除全部</button>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-400 text-xs font-bold uppercase tracking-wider border-b border-gray-100">
+                                <th class="py-3 px-4">日期 / 類型</th>
+                                <th class="py-3 px-4">里程</th>
+                                <th class="py-3 px-4">配速</th>
+                                <th class="py-3 px-4 hidden sm:table-cell">體感備忘</th>
+                                <th class="py-3 px-4 text-right">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logTableBody" class="divide-y divide-gray-50 text-sm text-gray-700">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="raceModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl animate-fade-in">
+            <h3 class="text-lg font-bold mb-4 text-gray-800">⚙️ 設定你的目標賽事</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">賽事名稱</label>
+                    <input type="text" id="inputRaceName" placeholder="例如：台北馬拉松" class="w-full p-2.5 border border-gray-200 rounded-xl">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">賽事日期</label>
+                    <input type="date" id="inputRaceDate" class="w-full p-2.5 border border-gray-200 rounded-xl">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">目標成績 / 備註</label>
+                    <input type="text" id="inputRaceGoal" placeholder="例如：完賽目標 Sub 3:20" class="w-full p-2.5 border border-gray-200 rounded-xl">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="toggleModal('raceModal', false)" class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">取消</button>
+                <button onclick="saveRaceSettings()" class="px-4 py-2 text-sm font-medium bg-brand text-white rounded-xl hover:bg-brandDark shadow-sm">儲存設定</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化預設資料
+        let raceData = JSON.parse(localStorage.getItem('run_race_data')) || {
+            name: '尚未設定目標賽事',
+            date: '',
+            goal: '請點擊下方設定鈕'
+        };
+        let weeklyGoal = parseFloat(localStorage.getItem('run_weekly_goal')) || 50;
+        let runLogs = JSON.parse(localStorage.getItem('run_logs')) || [];
+
+        // 頁面載入完成後執行
+        window.onload = function() {
+            // 設定今日日期為表單預設日期
+            document.getElementById('runDate').value = new Date().toISOString().split('T')[0];
+            updateRaceDOM();
+            updateWeeklyProgress();
+            renderLogs();
+        };
+
+        // 控制 Modal 開關
+        function toggleModal(id, show) {
+            const modal = document.getElementById(id);
+            if (show) {
+                modal.classList.remove('hidden');
+                // 預填當前賽事資料
+                document.getElementById('inputRaceName').value = raceData.name;
+                document.getElementById('inputRaceDate').value = raceData.date;
+                document.getElementById('inputRaceGoal').value = raceData.goal;
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // 儲存賽事設定
+        function saveRaceSettings() {
+            raceData.name = document.getElementById('inputRaceName').value || '未命名賽事';
+            raceData.date = document.getElementById('inputRaceDate').value;
+            raceData.goal = document.getElementById('inputRaceGoal').value || '尚未設定目標';
+            
+            localStorage.setItem('run_race_data', JSON.stringify(raceData));
+            updateRaceDOM();
+            toggleModal('raceModal', false);
+        }
+
+        // 更新賽事顯示與倒數
+        function updateRaceDOM() {
+            document.getElementById('displayRaceName').innerText = raceData.name;
+            document.getElementById('displayRaceGoal').innerText = `目標：${raceData.goal}`;
+            
+            if (raceData.date) {
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                const raceDate = new Date(raceData.date);
+                raceDate.setHours(0,0,0,0);
+                
+                const timeDiff = raceDate.getTime() - today.getTime();
+                const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                
+                if (daysDiff > 0) {
+                    document.getElementById('countdownDays').innerText = daysDiff;
+                } else if (daysDiff === 0) {
+                    document.getElementById('countdownDays').innerText = '🔥 今天 Race Day!';
+                } else {
+                    document.getElementById('countdownDays').innerText = '已完賽';
+                }
+            } else {
+                document.getElementById('countdownDays').innerText = '--';
+            }
+        }
+
+        // 設定每週目標跑量
+        function setWeeklyGoal() {
+            const newGoal = prompt('請輸入每週目標跑量 (km):', weeklyGoal);
+            if (newGoal && !isNaN(newGoal)) {
+                weeklyGoal = parseFloat(newGoal);
+                localStorage.setItem('run_weekly_goal', weeklyGoal);
+                updateWeeklyProgress();
+            }
+        }
+
+        // 計算並更新本週跑量進度條
+        function updateWeeklyProgress() {
+            document.getElementById('targetWeeklyVolume').innerText = weeklyGoal;
+            
+            // 計算本週一到週日的跑量總和
+            const today = new Date();
+            const currentDay = today.getDay(); 
+            const distanceDiff = currentDay === 0 ? -6 : 1 - currentDay; // 找出本週一
+            
+            const monday = new Date(today);
+            monday.setDate(today.getDate() + distanceDiff);
+            monday.setHours(0,0,0,0);
+
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            sunday.setHours(23,59,59,999);
+
+            let currentSum = 0;
+            runLogs.forEach(log => {
+                const logDate = new Date(log.date);
+                if (logDate >= monday && logDate <= sunday) {
+                    currentSum += parseFloat(log.distance);
+                }
+            });
+
+            currentSum = Math.round(currentSum * 100) / 100; // 四捨五入到小數後兩位
+            document.getElementById('currentWeeklyVolume').innerText = currentSum;
+
+            // 更新進度條長度
+            const percentage = Math.min((currentSum / weeklyGoal) * 100, 100);
+            document.getElementById('weeklyProgressBar').style.width = `${percentage}%`;
+        }
+
+        // 儲存訓練紀錄
+        function saveLog(e) {
+            e.preventDefault();
+            
+            const newLog = {
+                id: Date.now(),
+                date: document.getElementById('runDate').value,
+                type: document.getElementById('runType').value,
+                distance: parseFloat(document.getElementById('runDistance').value),
+                pace: document.getElementById('runPace').value,
+                notes: document.getElementById('runNotes').value || '無備忘錄'
+            };
+
+            runLogs.unshift(newLog); // 最新的排在最前面
+            // 依據日期由新到舊排序
+            runLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            localStorage.setItem('run_logs', JSON.stringify(runLogs));
+            
+            // 重設表單欄位
+            document.getElementById('runDistance').value = '';
+            document.getElementById('runPace').value = '';
+            document.getElementById('runNotes').value = '';
+            
+            updateWeeklyProgress();
+            renderLogs();
+        }
+
+        // 渲染歷史日誌列表
+        function renderLogs() {
+            const tbody = document.getElementById('logTableBody');
+            tbody.innerHTML = '';
+
+            if (runLogs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-gray-400 text-xs">暫無訓練紀錄，今天跑起來！</td></tr>`;
+                return;
+            }
+
+            runLogs.forEach(log => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50/80 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-3 px-4">
+                        <div class="font-medium text-gray-800">${log.date}</div>
+                        <div class="text-xs text-gray-400 mt-0.5">${log.type}</div>
+                    </td>
+                    <td class="py-3 px-4 font-bold text-gray-900">${log.distance} <span class="text-xs font-normal text-gray-400">km</span></td>
+                    <td class="py-3 px-4 font-mono text-gray-600">${log.pace}</td>
+                    <td class="py-3 px-4 text-xs text-gray-500 max-w-xs truncate hidden sm:table-cell" title="${log.notes}">${log.notes}</td>
+                    <td class="py-3 px-4 text-right">
+                        <button onclick="deleteLog(${log.id})" class="text-red-400 hover:text-red-600 text-xs font-medium">刪除</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 刪除單筆紀錄
+        function deleteLog(id) {
+            if(confirm('確定要刪除這筆訓練紀錄嗎？')) {
+                runLogs = runLogs.filter(log => log.id !== id);
+                localStorage.setItem('run_logs', JSON.stringify(runLogs));
+                updateWeeklyProgress();
+                renderLogs();
+            }
+        }
+
+        // 清除全部紀錄
+        function clearAllLogs() {
+            if(confirm('⚠️ 警告：這將會刪除所有的訓練歷史紀錄，且無法復原！確定嗎？')) {
+                runLogs = [];
+                localStorage.setItem('run_logs', JSON.stringify(runLogs));
+                updateWeeklyProgress();
+                renderLogs();
+            }
+        }
+    </script>
+</body>
+</html>
