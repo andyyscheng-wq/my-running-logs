@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <link rel="apple-touch-icon" href="IMG_2611.jpeg">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="apple-touch-icon" href="IMG_2611.jpeg">
     <title>個人跑步日誌 & 賽事目標控制台</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -38,8 +38,8 @@
                 
                 <div class="mt-4 bg-blue-50 p-4 rounded-xl text-center">
                     <span class="block text-xs text-brand font-semibold">賽事倒數</span>
-                    <span class="text-3xl font-black text-brand" id="countdownDays">--</span>
-                    <span class="text-xs text-brand font-semibold"> 天</span>
+                    <span class="text-3xl font-black text-brand" id="countdownWeeks">--</span>
+                    <span class="text-xs text-brand font-semibold"> 週</span>
                 </div>
                 
                 <button onclick="toggleModal('raceModal', true)" class="w-full mt-4 text-xs text-center text-gray-400 hover:text-brand transition">⚙️ 設定賽事目標</button>
@@ -150,18 +150,20 @@
     </div>
 
     <script>
-        // 初始化預設資料
+        // 初始化資料：預設帶入台北馬拉松與 12/20 日期（自動補上今年年份）
+        const currentYear = new Date().getFullYear();
+        let defaultRaceDate = `${currentYear}-12-20`;
+        
         let raceData = JSON.parse(localStorage.getItem('run_race_data')) || {
-            name: '尚未設定目標賽事',
-            date: '',
-            goal: '請點擊下方設定鈕'
+            name: '台北馬拉松',
+            date: defaultRaceDate,
+            goal: 'Sub 3:20 挑戰'
         };
         let weeklyGoal = parseFloat(localStorage.getItem('run_weekly_goal')) || 50;
         let runLogs = JSON.parse(localStorage.getItem('run_logs')) || [];
 
         // 頁面載入完成後執行
         window.onload = function() {
-            // 設定今日日期為表單預設日期
             document.getElementById('runDate').value = new Date().toISOString().split('T')[0];
             updateRaceDOM();
             updateWeeklyProgress();
@@ -173,7 +175,6 @@
             const modal = document.getElementById(id);
             if (show) {
                 modal.classList.remove('hidden');
-                // 預填當前賽事資料
                 document.getElementById('inputRaceName').value = raceData.name;
                 document.getElementById('inputRaceDate').value = raceData.date;
                 document.getElementById('inputRaceGoal').value = raceData.goal;
@@ -193,7 +194,7 @@
             toggleModal('raceModal', false);
         }
 
-        // 更新賽事顯示與倒數
+        // 更新賽事顯示與倒數（單位改為週）
         function updateRaceDOM() {
             document.getElementById('displayRaceName').innerText = raceData.name;
             document.getElementById('displayRaceGoal').innerText = `目標：${raceData.goal}`;
@@ -208,14 +209,16 @@
                 const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
                 
                 if (daysDiff > 0) {
-                    document.getElementById('countdownDays').innerText = daysDiff;
+                    // 將天數轉換為週數，四捨五入到小數點後第一位
+                    const weeksDiff = (daysDiff / 7).toFixed(1);
+                    document.getElementById('countdownWeeks').innerText = weeksDiff;
                 } else if (daysDiff === 0) {
-                    document.getElementById('countdownDays').innerText = '🔥 今天 Race Day!';
+                    document.getElementById('countdownWeeks').innerText = '🔥 Race Week!';
                 } else {
-                    document.getElementById('countdownDays').innerText = '已完賽';
+                    document.getElementById('countdownWeeks').innerText = '已完賽';
                 }
             } else {
-                document.getElementById('countdownDays').innerText = '--';
+                document.getElementById('countdownWeeks').innerText = '--';
             }
         }
 
@@ -233,10 +236,9 @@
         function updateWeeklyProgress() {
             document.getElementById('targetWeeklyVolume').innerText = weeklyGoal;
             
-            // 計算本週一到週日的跑量總和
             const today = new Date();
             const currentDay = today.getDay(); 
-            const distanceDiff = currentDay === 0 ? -6 : 1 - currentDay; // 找出本週一
+            const distanceDiff = currentDay === 0 ? -6 : 1 - currentDay;
             
             const monday = new Date(today);
             monday.setDate(today.getDate() + distanceDiff);
@@ -254,10 +256,9 @@
                 }
             });
 
-            currentSum = Math.round(currentSum * 100) / 100; // 四捨五入到小數後兩位
+            currentSum = Math.round(currentSum * 100) / 100;
             document.getElementById('currentWeeklyVolume').innerText = currentSum;
 
-            // 更新進度條長度
             const percentage = Math.min((currentSum / weeklyGoal) * 100, 100);
             document.getElementById('weeklyProgressBar').style.width = `${percentage}%`;
         }
@@ -275,13 +276,10 @@
                 notes: document.getElementById('runNotes').value || '無備忘錄'
             };
 
-            runLogs.unshift(newLog); // 最新的排在最前面
-            // 依據日期由新到舊排序
+            runLogs.unshift(newLog);
             runLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
-
             localStorage.setItem('run_logs', JSON.stringify(runLogs));
             
-            // 重設表單欄位
             document.getElementById('runDistance').value = '';
             document.getElementById('runPace').value = '';
             document.getElementById('runNotes').value = '';
@@ -296,7 +294,7 @@
             tbody.innerHTML = '';
 
             if (runLogs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-gray-400 text-xs">暫無訓練紀錄，今天跑起來！</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-400 text-xs">暫無訓練紀錄，今天跑起來！</td></tr>`;
                 return;
             }
 
