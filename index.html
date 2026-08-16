@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="apple-touch-icon" href="IMG_2611.jpeg">
-    <title>個人跑步日誌 & SUB 3 賽事目標控制台</title>
+    <title>個人跑步日誌 & 丹尼爾斯 21 週 SUB 3 控制台</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -24,7 +24,7 @@
     <!-- 導覽列 -->
     <nav class="bg-brand text-white shadow-md sticky top-0 z-50">
         <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold tracking-wide">🏃‍♂️ SUB 3 🔥 Target Dashboard</h1>
+            <h1 class="text-xl font-bold tracking-wide">🏃‍♂️ SUB 3 🔥 丹尼爾斯課表</h1>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">菁英訓練看板</span>
         </div>
     </nav>
@@ -49,31 +49,34 @@
                 <!-- 每週課表建議 (動態更新) -->
                 <div class="mt-4 bg-slate-900 text-white p-4 rounded-xl text-xs space-y-3">
                     <div class="flex justify-between items-center border-b border-gray-700 pb-2">
-                        <span class="text-yellow-400 font-bold text-sm">⚡ 本週訓練建議</span>
+                        <span class="text-yellow-400 font-bold text-sm">⚡ 丹尼爾斯質量課表</span>
                         <span class="text-gray-400 text-[10px]" id="phaseLabel">週期載入中</span>
                     </div>
                     <div>
-                        <div class="text-brand font-semibold flex items-center gap-1">🏃‍♂️ 長距離 (LSD)</div>
-                        <div class="text-gray-200 mt-0.5 leading-relaxed" id="lsdSuggestion">--</div>
+                        <div class="text-brand font-semibold flex items-center gap-1">🔷 Q1 課表</div>
+                        <div class="text-gray-200 mt-0.5 leading-relaxed" id="q1Suggestion">--</div>
                     </div>
                     <div>
-                        <div class="text-rose-400 font-semibold flex items-center gap-1">⏱️ 間歇/重點訓練 (Key Workout)</div>
-                        <div class="text-gray-200 mt-0.5 leading-relaxed" id="intervalSuggestion">--</div>
+                        <div class="text-rose-400 font-semibold flex items-center gap-1">🔶 Q2 課表</div>
+                        <div class="text-gray-200 mt-0.5 leading-relaxed" id="q2Suggestion">--</div>
                     </div>
                 </div>
                 
                 <button onclick="toggleModal('raceModal', true)" class="w-full mt-4 text-xs text-center text-gray-400 hover:text-brand transition">⚙️ 設定賽事目標</button>
             </div>
 
-            <!-- 本週里程進度 -->
+            <!-- 本週里程進度 (依課表%動態計算) -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                 <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Weekly Volume / 本週跑量</h2>
-                    <button onclick="setWeeklyGoal()" class="text-xs text-brand hover:underline">設定目標</button>
+                    <div>
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Weekly Volume</h2>
+                        <span class="text-[10px] text-gray-400" id="weeklyPercentLabel">(基準 80 km)</span>
+                    </div>
+                    <button onclick="setMaxWeeklyGoal()" class="text-xs text-brand hover:underline">調整基準</button>
                 </div>
                 <div class="flex items-baseline space-x-1">
                     <span class="text-3xl font-bold" id="currentWeeklyVolume">0</span>
-                    <span class="text-gray-500 text-sm">/ <span id="targetWeeklyVolume">70</span> km</span>
+                    <span class="text-gray-500 text-sm">/ <span id="targetWeeklyVolume">80</span> km</span>
                 </div>
                 <div class="w-full bg-gray-100 h-3 rounded-full mt-3 overflow-hidden">
                     <div id="weeklyProgressBar" class="bg-brand h-full transition-all duration-500" style="width: 0%"></div>
@@ -96,11 +99,12 @@
                     <div class="col-span-2 sm:col-span-1">
                         <label class="block text-xs font-semibold text-gray-500 mb-1">訓練類型</label>
                         <select id="runType" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand">
-                            <option value="輕鬆跑">E 輕鬆跑 (恢復體感)</option>
-                            <option value="配速跑">M 配速跑 (體感 4'15")</option>
-                            <option value="間歇跑">I/T 間歇跑 (乳酸閾值/T配速)</option>
-                            <option value="長距離(LSD)">LSD 長距離 (耐力累積)</option>
-                            <option value="越野跑">T 越野跑 / 縱走 (核心肌群)</option>
+                            <option value="E 輕鬆跑">E 輕鬆跑 (Easy)</option>
+                            <option value="M 配速跑">M 配速跑 (Marathon Pace 4'15")</option>
+                            <option value="T 閾值跑">T 閾值間歇 (Threshold)</option>
+                            <option value="I 間歇跑">I 最大攝氧間歇 (Interval)</option>
+                            <option value="R 重複跑">R 速度重複跑 (Repetition)</option>
+                            <option value="L 長距離">L 長距離跑 (Long Run)</option>
                         </select>
                     </div>
                     <div>
@@ -113,7 +117,7 @@
                     </div>
                     <div class="col-span-2">
                         <label class="block text-xs font-semibold text-gray-500 mb-1">體感與備忘錄</label>
-                        <input type="text" id="runNotes" placeholder="例如：核心穩定度佳，T配速體感順暢 / 股四頭肌稍緊" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand">
+                        <input type="text" id="runNotes" placeholder="例如：Q課表順暢吃完，T配速維持在 3'55~4'00" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand">
                     </div>
                     <div class="col-span-2 mt-2">
                         <button type="submit" class="w-full bg-brand hover:bg-brandDark text-white font-semibold p-3 rounded-xl shadow-sm transition">儲存訓練日誌</button>
@@ -125,7 +129,7 @@
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <div class="p-5 border-b border-gray-100 flex justify-between items-center">
                     <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-                        <span class="text-xl">📊</span> SUB 3 訓練足跡
+                        <span class="text-xl">📊</span> 訓練足跡
                     </h2>
                     <button onclick="clearAllLogs()" class="text-xs text-red-400 hover:text-red-600">清除全部</button>
                 </div>
@@ -182,7 +186,9 @@
             date: defaultRaceDate,
             goal: 'SUB 3:00 挑戰'
         };
-        let weeklyGoal = parseFloat(localStorage.getItem('run_weekly_goal')) || 70;
+        // 目標最大週跑量預設為 80 公里
+        let maxWeeklyGoal = parseFloat(localStorage.getItem('run_max_weekly_goal')) || 80;
+        let currentTargetVolume = 80;
         let runLogs = JSON.parse(localStorage.getItem('run_logs')) || [];
 
         window.onload = function() {
@@ -239,124 +245,145 @@
             }
         }
 
-        // 依剩餘週數動態更新 18 週專屬課表建議
+        // 丹尼爾斯 21 週完整課表邏輯
         function updateTrainingSuggestions(weeks) {
             const phaseLabel = document.getElementById('phaseLabel');
-            const lsdEl = document.getElementById('lsdSuggestion');
-            const intEl = document.getElementById('intervalSuggestion');
+            const q1El = document.getElementById('q1Suggestion');
+            const q2El = document.getElementById('q2Suggestion');
+            const weeklyPercentLabel = document.getElementById('weeklyPercentLabel');
 
-            if (weeks >= 17.5 && weeks <= 18.9) {
-                // 倒數 18 週
-                phaseLabel.innerText = '倒數 18 週・基礎奠定與前期有氧打底';
-                lsdEl.innerText = '21 ~ 25 km (穩健累積有氧基礎與跑動經濟性)';
-                intEl.innerHTML = '<span class="text-gray-300">本週以基礎有氧與核心穩定為主，可安排輕鬆跑搭配 6~8 趟 100m 輕快跑 (Strides)</span>';
-            } else if (weeks >= 16.5 && weeks < 17.5) {
-                // 倒數 17 週
-                phaseLabel.innerText = '倒數 17 週・基礎有氧與 T 配速閾值期';
-                lsdEl.innerText = '22 ~ 25 km (穩健累積長距離有氧耐力)';
-                intEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">2 × (5km T + 3min rest)</span> + <span class="text-amber-300 font-mono">60min E</span>';
-            } else if (weeks >= 15.5 && weeks < 16.5) {
-                // 倒數 16 週
-                phaseLabel.innerText = '倒數 16 週・閾值耐受與長距離擴張期';
-                lsdEl.innerText = '25 ~ 30 km (維持勻速巡航體感)';
-                intEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">4 × (3km T + 2min rest)</span> + <span class="text-amber-300 font-mono">30min E</span>';
-            } else if (weeks >= 14.5 && weeks < 15.5) {
-                // 倒數 15 週
-                phaseLabel.innerText = '倒數 15 週・長跑節奏化與高低速轉換';
-                lsdEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">4 × (3km T + 2min rest)</span> + <span class="text-amber-300 font-mono">40min E</span>';
-                intEl.innerHTML = '<span class="text-amber-300 font-mono">30min E</span> + <span class="text-yellow-400 font-mono font-bold">5 × (1km T + 400m 慢跑)</span> + <span class="text-amber-300 font-mono">30min E</span>';
-            } else if (weeks >= 13.5 && weeks < 14.5) {
-                // 倒數 14 週
-                phaseLabel.innerText = '倒數 14 週・馬拉松配速 (M) 專項模擬';
-                lsdEl.innerText = '30 km (大長跑耐力檢驗)';
-                intEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">15km M 配速 (4\'15")</span> + <span class="text-amber-300 font-mono">30min E</span>';
-            } else if (weeks >= 12.5 && weeks < 13.5) {
-                // 倒數 13 週
-                phaseLabel.innerText = '倒數 13 週・長跑調節與高容量 T 配速堆疊';
-                lsdEl.innerText = '20 ~ 25 km (跑量調節恢復)';
-                intEl.innerHTML = '<span class="text-amber-300 font-mono">20min E</span> + <span class="text-yellow-400 font-mono font-bold">4 × (3km T + 2min rest)</span> + <span class="text-amber-300 font-mono">60min E</span>';
-            } else if (weeks >= 11.5 && weeks < 12.5) {
-                // 倒數 12 週
-                phaseLabel.innerText = '倒數 12 週・專項 18km M 配速長距離挑戰';
-                lsdEl.innerHTML = '<span class="text-amber-300 font-mono">30min E</span> + <span class="text-yellow-400 font-mono font-bold">18km M 配速 (4\'15")</span> + <span class="text-amber-300 font-mono">30min E</span>';
-                intEl.innerHTML = '<span class="text-gray-400 italic">無安排傳統間歇（全力投注長跑專項質量與恢復）</span>';
-            } else if (weeks >= 10.5 && weeks < 11.5) {
-                // 倒數 11 週
-                phaseLabel.innerText = '倒數 11 週・35km 大長跑與深層乳酸耐受';
-                lsdEl.innerText = '30 ~ 35 km (全週期最高里程耐力抗疲勞)';
-                intEl.innerHTML = '<span class="text-amber-300 font-mono">60min E</span> + <span class="text-yellow-400 font-mono font-bold">4km T</span> + <span class="text-amber-300 font-mono">30min E</span> + <span class="text-yellow-400 font-mono font-bold">3km T</span> + <span class="text-amber-300 font-mono">10min E</span>';
-            } else if (weeks >= 9.5 && weeks < 10.5) {
-                // 倒數 10 週
-                phaseLabel.innerText = '倒數 10 週・半馬距離 20km M 配速專項考驗';
-                lsdEl.innerHTML = '<span class="text-amber-300 font-mono">30min E</span> + <span class="text-yellow-400 font-mono font-bold">20km M 配速 (4\'15")</span> + <span class="text-amber-300 font-mono">20min E</span>';
-                intEl.innerHTML = '<span class="text-gray-300 font-mono">安排輕鬆跑或滾筒伸展，專注於長跑專項體感吸收</span>';
-            } else if (weeks >= 8.5 && weeks < 9.5) {
-                // 倒數 9 週
-                phaseLabel.innerText = '倒數 9 週・長跑結合 T 配速與多組閾值間歇';
-                lsdEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">4km T</span> + <span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">4km T</span> + <span class="text-amber-300 font-mono">40min E</span>';
-                intEl.innerHTML = '<span class="text-amber-300 font-mono">30min E</span> + <span class="text-yellow-400 font-mono font-bold">4 × (3km T + 2min rest)</span> + <span class="text-amber-300 font-mono">30min E</span>';
-            } else if (weeks >= 7.5 && weeks < 8.5) {
-                // 倒數 8 週
-                phaseLabel.innerText = '倒數 8 週・超長距離 35km 有氧巡航';
-                lsdEl.innerText = '30 ~ 35 km E (維持深層耐力儲備與脂肪供能)';
-                intEl.innerHTML = '<span class="text-gray-300">本週以累積純有氧大長跑為主，間歇可安排輕鬆慢跑調節</span>';
-            } else if (weeks >= 6.5 && weeks < 7.5) {
-                // 倒數 7 週
-                phaseLabel.innerText = '倒數 7 週・專項 20km M 配速與 2km 短間歇';
-                lsdEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">20km M 配速 (4\'15")</span>';
-                intEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">5 × (2km T + 2min rest)</span> + <span class="text-amber-300 font-mono">60min E</span>';
-            } else if (weeks >= 5.5 && weeks < 6.5) {
-                // 倒數 6 週
-                phaseLabel.innerText = '倒數 6 週・高密度 3km T 閾值強化';
-                lsdEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">4 × (3km T + 2min rest)</span> + <span class="text-amber-300 font-mono">10min E</span>';
-                intEl.innerHTML = '<span class="text-gray-300">專注長跑課表的高強度輸出，平日安排基礎有氧與肌力維持</span>';
-            } else if (weeks >= 4.5 && weeks < 5.5) {
-                // 倒數 5 週
-                phaseLabel.innerText = '倒數 5 週・最後大長跑與複合專項間歇';
-                lsdEl.innerText = '30 ~ 35 km E (全週期最後一趟超長距離耐力儲備)';
-                intEl.innerHTML = '<span class="text-amber-300 font-mono">20min E</span> + <span class="text-yellow-400 font-mono font-bold">10km M</span> + <span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">4km T</span> + <span class="text-amber-300 font-mono">10min E</span>';
-            } else if (weeks >= 3.5 && weeks < 4.5) {
-                // 倒數 4 週
-                phaseLabel.innerText = '倒數 4 週・金字塔階梯 T 配速巔峰考驗';
-                lsdEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">5km T</span> + <span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">4km T</span> + <span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">3km T</span>';
-                intEl.innerHTML = '<span class="text-gray-300">體感漸進衝刺，準備進入減量期</span>';
-            } else if (weeks >= 2.5 && weeks < 3.5) {
-                // 倒數 3 週
-                phaseLabel.innerText = '倒數 3 週・第一階段減量與專項體感固化';
-                lsdEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">20km M 配速 (4\'15")</span> + <span class="text-amber-300 font-mono">50min E</span>';
-                intEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">4 × (2km T + 2min rest)</span> + <span class="text-amber-300 font-mono">60min E</span>';
-            } else if (weeks >= 1.5 && weeks < 2.5) {
-                // 倒數 2 週
-                phaseLabel.innerText = '倒數 2 週・第二階段深度減量與維持肌肉彈性';
-                lsdEl.innerHTML = '<span class="text-amber-300 font-mono">30min E</span> + <span class="text-yellow-400 font-mono font-bold">3 × (3km T + 2min rest)</span> + <span class="text-amber-300 font-mono">20min E</span>';
-                intEl.innerHTML = '<span class="text-gray-300">跑量大幅下修 40%，維持攝氧與神經肌肉刺激，避免疲勞</span>';
-            } else if (weeks > 0 && weeks < 1.5) {
-                // 最後一週 (賽事週)
-                phaseLabel.innerText = '賽事週・超補償與最後激勵';
-                lsdEl.innerText = '賽前 2~3 天 5~7 km 輕鬆跑 + 3~4 趟 100m 開腿快跑';
-                intEl.innerHTML = '<span class="text-amber-300 font-mono">20min E</span> + <span class="text-yellow-400 font-mono font-bold">3 × (2km T + 2min rest)</span> + <span class="text-amber-300 font-mono">10min E</span>';
-            } else if (weeks === 0) {
-                phaseLabel.innerText = '🔥 Race Day・台北馬拉松';
-                lsdEl.innerText = '42.195 km @ 4\'15"/km (穩健發揮，全力衝刺 Sub 3！)';
-                intEl.innerText = '相信 18 週扎實訓練的累積！';
+            let percent = 1.0;
+            let roundWeek = Math.round(weeks);
+
+            if (roundWeek >= 21) {
+                percent = 0.8;
+                phaseLabel.innerText = '倒數 21 週・80%P (約 ' + (maxWeeklyGoal * percent).toFixed(0) + ' km)';
+                q1El.innerText = 'L長跑 = 不要超過 22.4 公里或 90 分鐘';
+                q2El.innerHTML = '3.2km E + 3×(1.6km T + 2分休) + 3×(3分H + 2分慢跑) + 4×(200m R + 200m慢跑) + 1.6km E';
+            } else if (roundWeek === 20) {
+                percent = 1.0;
+                phaseLabel.innerText = '倒數 20 週・100%P (約 ' + (maxWeeklyGoal * percent).toFixed(0) + ' km)';
+                q1El.innerHTML = '30 分鐘 E + <span class="text-yellow-400 font-bold">14.4 公里 M</span>';
+                q2El.innerHTML = '3.2km E + 8km M + 1.6km E + 6.4km M + 3.2km E';
+            } else if (roundWeek === 19) {
+                percent = 0.9;
+                phaseLabel.innerText = '倒數 19 週・90%P (約 ' + (maxWeeklyGoal * percent).toFixed(0) + ' km)';
+                q1El.innerHTML = '3.2km E + 5×(1.6km T + 1分休) + 3.2km E';
+                q2El.innerHTML = '3.2km E + 4×(1.6km T + 1分休) + 4×(400m R + 400m慢跑) + 1.6km E';
+            } else if (roundWeek === 18) {
+                percent = 1.0;
+                phaseLabel.innerText = '倒數 18 週・100%P (約 ' + (maxWeeklyGoal * percent).toFixed(0) + ' km)';
+                q1El.innerText = '本週不用進行 Q 課表，整週都進行 E 強度課表';
+                q2El.innerText = '其中兩天在最後附加 6～8 趟 ST (輕快跑)';
+            } else if (roundWeek === 17) {
+                percent = 0.8;
+                phaseLabel.innerText = '倒數 17 週・80%P (約 ' + (maxWeeklyGoal * percent).toFixed(0) + ' km)';
+                q1El.innerText = 'L長跑 = 不要超過 24 公里或 100 分鐘';
+                q2El.innerHTML = '3.2km E + 3×(1.6km T + 3分休) + 3×(3分H + 2分慢跑) + 8×(200m R + 200m慢跑) + 1.6km E';
+            } else if (roundWeek === 16) {
+                percent = 0.9;
+                phaseLabel.innerText = '倒數 16 週・90%P (約 ' + (maxWeeklyGoal * percent).toFixed(0) + ' km)';
+                q1El.innerHTML = '4.8km E + <span class="text-yellow-400 font-bold">16 公里 M</span>';
+                q2El.innerHTML = '3.2km E + 9.6km M + 1.6km E + 8km M + 1.6km E';
+            } else if (roundWeek === 15) {
+                percent = 0.8;
+                phaseLabel.innerText = '倒數 15 週・80%P (約 ' + (maxWeeklyGoal * percent).toFixed(0) + ' km)';
+                q1El.innerHTML = '3.2km E + 2×(3.2km T + 2分休) + 3.2km E';
+                q2El.innerHTML = '3.2km E + 4.8km T + 3分休 + 3.2km T + 2分休 + 8×(200m R + 200m慢跑) + 2×(1.6km T + 1分休) + 1.6km E + 3.2km E';
+            } else if (roundWeek === 14) {
+                percent = 1.0;
+                phaseLabel.innerText = '倒數 14 週・100%P (約 ' + (maxWeeklyGoal * percent).toFixed(0) + ' km)';
+                q1El.innerText = '本週不用進行 Q 課表，整週都進行 E 強度課表';
+                q2El.innerText = '其中兩天在最後附加 6～8 趟 ST (輕快跑)';
+            } else if (roundWeek === 13) {
+                percent = 0.9;
+                phaseLabel.innerText = '倒數 13 週・90%P (約 ' + (maxWeeklyGoal * percent).toFixed(0) + ' km)';
+                q1El.innerText = 'L長跑 = 不要超過 26 公里或 120 分鐘';
+                q2El.innerHTML = '3.2km E + 3×(1.6km T + 1分休) + 3分休 + 3×(1,000m I + 3分慢跑) + 4×(400m R + 400m慢跑) + 1.6km E';
+            } else if (roundWeek === 12) {
+                percent = 0.8;
+                phaseLabel.innerText = '倒數 12 週・80%P (約 ' + (maxWeeklyGoal * percent).toFixed(0) + ' km)';
+                q1El.innerHTML = '4.8km E + <span class="text-yellow-400 font-bold">20.8 公里 M</span>';
+                q2El.innerHTML = '1.6km E + 9.6km M + 1.6km E + 8km M + 1.6km E + 3.2km M + 1.6km E';
+            } else if (roundWeek === 11) {
+                percent = 0.7;
+                phaseLabel.innerText = '倒數 11 週・70%P (約 ' + (maxWeeklyGoal * percent).toFixed(0) + ' km)';
+                q1El.innerHTML = '3.2km E + 2×(3.2km T + 2分休)';
+                q2El.innerHTML = '3.2km E + 4.8km T + 3分休 + 3.2km T + 2分休 + 2×(400m R + 400m慢跑) + 2×(1.6km T + 1分休) + 1.6km E + 4×(200m R + 200m慢跑) + 1.6km E';
+            } else if (roundWeek === 10) {
+                percent = 1.0;
+                phaseLabel.innerText = '倒數 10 週・100%P (約 ' + (maxWeeklyGoal * percent).toFixed(0) + ' km)';
+                q1El.innerText = '本週不用進行 Q 課表，整週都進行 E 強度課表';
+                q2El.innerText = '其中兩天在最後附加 6～8 趟 ST (輕快跑)';
+            } else if (roundWeek === 9) {
+                percent = 0.9;
+                phaseLabel.innerText = '倒數 9 週・90%P (約 ' + (maxWeeklyGoal * percent).toFixed(0) + ' km)';
+                q1El.innerText = 'L長跑 = 不要超過 26 公里或 140 分鐘';
+                q2El.innerHTML = '3.2km E + 3×(1.6km T + 1分休) + 4×(3分H + 2分慢跑) + 6×(200m R + 200m慢跑) + 1.6km E';
+            } else if (roundWeek === 8) {
+                percent = 1.0;
+                phaseLabel.innerText = '倒數 8 週・100%P (約 ' + (maxWeeklyGoal * percent).toFixed(0) + ' km)';
+                q1El.innerHTML = '20 分鐘 E + <span class="text-yellow-400 font-bold">22.4 公里 M</span>';
+                q2El.innerHTML = '1.6km E + 9.6km M + 1.6km E + 11.2km M + 1.6km E';
+            } else if (roundWeek === 7) {
+                percent = 0.8;
+                phaseLabel.innerText = '倒數 7 週・80%P (約 ' + (maxWeeklyGoal * percent).toFixed(0) + ' km)';
+                q1El.innerHTML = '6.4km E + 3×(3.2km T + 2分休) + 1.6km T + 1.6km E';
+                q2El.innerHTML = '3.2km E + 2×(3.2km T + 2分休) + 8×(200m R + 200m慢跑) + 4×(1.6km T + 1分休) + 3.2km E';
+            } else if (roundWeek === 6) {
+                percent = 1.0;
+                phaseLabel.innerText = '倒數 6 週・100%P (約 ' + (maxWeeklyGoal * percent).toFixed(0) + ' km)';
+                q1El.innerText = '本週不用進行 Q 課表，整週都進行 E 強度課表';
+                q2El.innerText = '其中兩天在最後附加 6～8 趟 ST (輕快跑)';
+            } else if (roundWeek === 5) {
+                percent = 0.9;
+                phaseLabel.innerText = '倒數 5 週・90%P (約 ' + (maxWeeklyGoal * percent).toFixed(0) + ' km)';
+                q1El.innerText = 'L長跑 = 不要超過 26 公里或 140 分鐘';
+                q2El.innerHTML = '3.2km E + 2×(4.8km T + 3分休) + 3.2km T + 3分休 + 4×(3分H + 2分慢跑) + 8×(200m R + 200m慢跑) + 1.6km E';
+            } else if (roundWeek === 4) {
+                percent = 0.9;
+                phaseLabel.innerText = '倒數 4 週・90%P (約 ' + (maxWeeklyGoal * percent).toFixed(0) + ' km)';
+                q1El.innerHTML = '10 分鐘 E + <span class="text-yellow-400 font-bold">22.4 公里 M</span>';
+                q2El.innerHTML = '1.6km E + 12.8km M + 1.6km E + 8km M + 1.6km E';
+            } else if (roundWeek === 3) {
+                percent = 0.8;
+                phaseLabel.innerText = '倒數 3 週・80%P (約 ' + (maxWeeklyGoal * percent).toFixed(0) + ' km)';
+                q1El.innerHTML = '60 分鐘 E + 3×(3.2km T + 2分休) + 1.6km T';
+                q2El.innerHTML = '3.2km E + 2×(3.2km T + 2分休) + 2×(1.6km T + 1分休) + 3.2km E + 8×(200m R + 200m慢跑) + 3.2km E';
+            } else if (roundWeek === 2) {
+                percent = 0.7;
+                phaseLabel.innerText = '倒數 2 週・70%P (約 ' + (maxWeeklyGoal * percent).toFixed(0) + ' km)';
+                q1El.innerText = '本週不用進行 Q 課表，整週都進行 E 強度課表';
+                q2El.innerText = '其中兩天在最後附加 6～8 趟 ST (輕快跑)';
+            } else if (roundWeek === 1) {
+                percent = 0.5;
+                phaseLabel.innerText = '賽事週・減量與比賽日';
+                q1El.innerHTML = '• 剩七天: 90分E<br>• 剩六天: 60分E<br>• 剩五天: 3×(1.6km T + 2分休)<br>• 剩四天: 60分E';
+                q2El.innerHTML = '• 剩三天: 45分E<br>• 剩二天: 30分E<br>• 前一天: 30分E<br>• <span class="text-yellow-400 font-bold">比賽日: 42.195 km Race!</span>';
             } else {
-                phaseLabel.innerText = '前期體能打底期';
-                lsdEl.innerText = '18–20 km @ 4\'50"–5\'10"';
-                intEl.innerText = '輕鬆跑 + 核心肌群強化訓練';
+                percent = 1.0;
+                phaseLabel.innerText = '賽事週';
+                q1El.innerText = '放鬆跑 20~30 分鐘';
+                q2El.innerText = '賽事日穩健發揮，突破 Sub 3！';
             }
+
+            // 更新週跑量目標值
+            currentTargetVolume = Math.round(maxWeeklyGoal * percent);
+            weeklyPercentLabel.innerText = `(${Math.round(percent * 100)}%P / 基準 ${maxWeeklyGoal}km)`;
+            updateWeeklyProgress();
         }
 
-        function setWeeklyGoal() {
-            const newGoal = prompt('請輸入每週目標跑量 (km):', weeklyGoal);
+        function setMaxWeeklyGoal() {
+            const newGoal = prompt('請輸入最大週跑量基準 (km):', maxWeeklyGoal);
             if (newGoal && !isNaN(newGoal)) {
-                weeklyGoal = parseFloat(newGoal);
-                localStorage.setItem('run_weekly_goal', weeklyGoal);
-                updateWeeklyProgress();
+                maxWeeklyGoal = parseFloat(newGoal);
+                localStorage.setItem('run_max_weekly_goal', maxWeeklyGoal);
+                updateRaceDOM();
             }
         }
 
         function updateWeeklyProgress() {
-            document.getElementById('targetWeeklyVolume').innerText = weeklyGoal;
+            document.getElementById('targetWeeklyVolume').innerText = currentTargetVolume;
             
             const today = new Date();
             const currentDay = today.getDay(); 
@@ -381,7 +408,7 @@
             currentSum = Math.round(currentSum * 100) / 100;
             document.getElementById('currentWeeklyVolume').innerText = currentSum;
 
-            const percentage = Math.min((currentSum / weeklyGoal) * 100, 100);
+            const percentage = Math.min((currentSum / currentTargetVolume) * 100, 100);
             document.getElementById('weeklyProgressBar').style.width = `${percentage}%`;
         }
 
