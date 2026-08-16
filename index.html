@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="apple-touch-icon" href="IMG_2611.jpeg">
-    <title>個人跑步日誌 & 賽事目標控制台</title>
+    <title>個人跑步日誌 & SUB 3 賽事目標控制台</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        brand: '#0086DB', // 專業科技藍
+                        brand: '#0086DB',
                         brandDark: '#006cb3',
                     }
                 }
@@ -21,30 +21,51 @@
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans min-h-screen pb-12">
 
+    <!-- 導覽列 -->
     <nav class="bg-brand text-white shadow-md sticky top-0 z-50">
         <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold tracking-wide">🏃‍♂️ PR Target Dashboard</h1>
-            <span class="text-sm bg-white/20 px-3 py-1 rounded-full">每日訓練看板</span>
+            <h1 class="text-xl font-bold tracking-wide">🏃‍♂️ SUB 3 🔥 Target Dashboard</h1>
+            <span class="text-sm bg-white/20 px-3 py-1 rounded-full">菁英訓練看板</span>
         </div>
     </nav>
 
+    <!-- 主區塊 -->
     <main class="max-w-4xl mx-auto px-4 mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
         
+        <!-- 左側：目標賽事、本週課表建議、跑量進度 -->
         <div class="md:col-span-1 space-y-6">
+            <!-- 賽事目標卡片 -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                 <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Target Race / 目標賽事</h2>
                 <div class="text-xl font-bold text-gray-800" id="displayRaceName">載入中...</div>
-                <div class="text-sm text-gray-500 mt-1" id="displayRaceGoal">目標：--</div>
+                <div class="text-sm text-brand font-bold mt-1" id="displayRaceGoal">目標：--</div>
                 
                 <div class="mt-4 bg-blue-50 p-4 rounded-xl text-center">
                     <span class="block text-xs text-brand font-semibold">賽事倒數</span>
                     <span class="text-3xl font-black text-brand" id="countdownWeeks">--</span>
                     <span class="text-xs text-brand font-semibold"> 週</span>
                 </div>
+
+                <!-- 每週課表建議 (動態更新) -->
+                <div class="mt-4 bg-slate-900 text-white p-4 rounded-xl text-xs space-y-3">
+                    <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+                        <span class="text-yellow-400 font-bold text-sm">⚡ 本週訓練建議</span>
+                        <span class="text-gray-400 text-[10px]" id="phaseLabel">週期載入中</span>
+                    </div>
+                    <div>
+                        <div class="text-brand font-semibold flex items-center gap-1">🏃‍♂️ 長距離 (LSD)</div>
+                        <div class="text-gray-200 mt-0.5 leading-relaxed" id="lsdSuggestion">--</div>
+                    </div>
+                    <div>
+                        <div class="text-rose-400 font-semibold flex items-center gap-1">⏱️ 間歇訓練 (Interval)</div>
+                        <div class="text-gray-200 mt-0.5 leading-relaxed" id="intervalSuggestion">--</div>
+                    </div>
+                </div>
                 
                 <button onclick="toggleModal('raceModal', true)" class="w-full mt-4 text-xs text-center text-gray-400 hover:text-brand transition">⚙️ 設定賽事目標</button>
             </div>
 
+            <!-- 本週里程進度 -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                 <div class="flex justify-between items-center mb-2">
                     <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Weekly Volume / 本週跑量</h2>
@@ -52,7 +73,7 @@
                 </div>
                 <div class="flex items-baseline space-x-1">
                     <span class="text-3xl font-bold" id="currentWeeklyVolume">0</span>
-                    <span class="text-gray-500 text-sm">/ <span id="targetWeeklyVolume">50</span> km</span>
+                    <span class="text-gray-500 text-sm">/ <span id="targetWeeklyVolume">70</span> km</span>
                 </div>
                 <div class="w-full bg-gray-100 h-3 rounded-full mt-3 overflow-hidden">
                     <div id="weeklyProgressBar" class="bg-brand h-full transition-all duration-500" style="width: 0%"></div>
@@ -60,7 +81,9 @@
             </div>
         </div>
 
+        <!-- 右側：新增紀錄與歷史清單 -->
         <div class="md:col-span-2 space-y-6">
+            <!-- 快速新增日誌 -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                 <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                     <span class="text-xl">📝</span> 紀錄今日訓練
@@ -73,24 +96,24 @@
                     <div class="col-span-2 sm:col-span-1">
                         <label class="block text-xs font-semibold text-gray-500 mb-1">訓練類型</label>
                         <select id="runType" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand">
-                            <option value="輕鬆跑">E 輕鬆跑</option>
-                            <option value="配速跑">M 配速跑</option>
-                            <option value="間歇跑">I 間歇跑</option>
-                            <option value="長距離(LSD)">LSD 長距離</option>
-                            <option value="越野跑">T 越野跑 / 縱走</option>
+                            <option value="輕鬆跑">E 輕鬆跑 (恢復體感)</option>
+                            <option value="配速跑">M 配速跑 (體感 4'15")</option>
+                            <option value="間歇跑">I 間歇跑 (乳酸閾值/T配速)</option>
+                            <option value="長距離(LSD)">LSD 長距離 (耐力累積)</option>
+                            <option value="越野跑">T 越野跑 / 縱走 (核心肌群)</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-500 mb-1">里程 (km)</label>
-                        <input type="number" step="0.01" id="runDistance" placeholder="例如: 10" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand">
+                        <input type="number" step="0.01" id="runDistance" placeholder="例如: 12" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-500 mb-1">平均配速 (分'秒")</label>
-                        <input type="text" id="runPace" placeholder="例如: 5'10" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand">
+                        <input type="text" id="runPace" placeholder="例如: 4'12" required class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand">
                     </div>
                     <div class="col-span-2">
-                        <label class="block text-xs font-semibold text-gray-500 mb-1">體感與備忘錄 (自覺強度、肌肉狀況等)</label>
-                        <input type="text" id="runNotes" placeholder="例如：核心穩定度佳，體感輕鬆 / 左側小腿稍緊" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand">
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">體感與備忘錄</label>
+                        <input type="text" id="runNotes" placeholder="例如：核心穩定度佳，T配速體感順暢 / 股四頭肌稍緊" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand">
                     </div>
                     <div class="col-span-2 mt-2">
                         <button type="submit" class="w-full bg-brand hover:bg-brandDark text-white font-semibold p-3 rounded-xl shadow-sm transition">儲存訓練日誌</button>
@@ -98,10 +121,11 @@
                 </form>
             </div>
 
+            <!-- 歷史紀錄清單 -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <div class="p-5 border-b border-gray-100 flex justify-between items-center">
                     <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-                        <span class="text-xl">📊</span> 歷史訓練日誌
+                        <span class="text-xl">📊</span> SUB 3 訓練足跡
                     </h2>
                     <button onclick="clearAllLogs()" class="text-xs text-red-400 hover:text-red-600">清除全部</button>
                 </div>
@@ -117,17 +141,17 @@
                                 <th class="py-3 px-4 text-right">操作</th>
                             </tr>
                         </thead>
-                        <tbody id="logTableBody" class="divide-y divide-gray-50 text-sm text-gray-700">
-                            </tbody>
+                        <tbody id="logTableBody" class="divide-y divide-gray-50 text-sm text-gray-700"></tbody>
                     </table>
                 </div>
             </div>
         </div>
     </main>
 
+    <!-- 賽事設定彈窗 -->
     <div id="raceModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl animate-fade-in">
-            <h3 class="text-lg font-bold mb-4 text-gray-800">⚙️ 設定你的目標賽事</h3>
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
+            <h3 class="text-lg font-bold mb-4 text-gray-800">⚙️ 設定目標賽事</h3>
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-gray-500 mb-1">賽事名稱</label>
@@ -138,8 +162,8 @@
                     <input type="date" id="inputRaceDate" class="w-full p-2.5 border border-gray-200 rounded-xl">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-gray-500 mb-1">目標成績 / 備註</label>
-                    <input type="text" id="inputRaceGoal" placeholder="例如：完賽目標 Sub 3:20" class="w-full p-2.5 border border-gray-200 rounded-xl">
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">目標成績</label>
+                    <input type="text" id="inputRaceGoal" placeholder="例如：SUB 3:00 挑戰" class="w-full p-2.5 border border-gray-200 rounded-xl">
                 </div>
             </div>
             <div class="flex justify-end space-x-3 mt-6">
@@ -150,19 +174,17 @@
     </div>
 
     <script>
-        // 初始化資料：預設帶入台北馬拉松與 12/20 日期（自動補上今年年份）
         const currentYear = new Date().getFullYear();
         let defaultRaceDate = `${currentYear}-12-20`;
         
         let raceData = JSON.parse(localStorage.getItem('run_race_data')) || {
             name: '台北馬拉松',
             date: defaultRaceDate,
-            goal: 'Sub 3:20 挑戰'
+            goal: 'SUB 3:00 挑戰'
         };
-        let weeklyGoal = parseFloat(localStorage.getItem('run_weekly_goal')) || 50;
+        let weeklyGoal = parseFloat(localStorage.getItem('run_weekly_goal')) || 70;
         let runLogs = JSON.parse(localStorage.getItem('run_logs')) || [];
 
-        // 頁面載入完成後執行
         window.onload = function() {
             document.getElementById('runDate').value = new Date().toISOString().split('T')[0];
             updateRaceDOM();
@@ -170,7 +192,6 @@
             renderLogs();
         };
 
-        // 控制 Modal 開關
         function toggleModal(id, show) {
             const modal = document.getElementById(id);
             if (show) {
@@ -183,18 +204,15 @@
             }
         }
 
-        // 儲存賽事設定
         function saveRaceSettings() {
             raceData.name = document.getElementById('inputRaceName').value || '未命名賽事';
             raceData.date = document.getElementById('inputRaceDate').value;
             raceData.goal = document.getElementById('inputRaceGoal').value || '尚未設定目標';
-            
             localStorage.setItem('run_race_data', JSON.stringify(raceData));
             updateRaceDOM();
             toggleModal('raceModal', false);
         }
 
-        // 更新賽事顯示與倒數（單位改為週）
         function updateRaceDOM() {
             document.getElementById('displayRaceName').innerText = raceData.name;
             document.getElementById('displayRaceGoal').innerText = `目標：${raceData.goal}`;
@@ -209,20 +227,87 @@
                 const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
                 
                 if (daysDiff > 0) {
-                    // 將天數轉換為週數，四捨五入到小數點後第一位
                     const weeksDiff = (daysDiff / 7).toFixed(1);
                     document.getElementById('countdownWeeks').innerText = weeksDiff;
+                    updateTrainingSuggestions(parseFloat(weeksDiff));
                 } else if (daysDiff === 0) {
                     document.getElementById('countdownWeeks').innerText = '🔥 Race Week!';
+                    updateTrainingSuggestions(0);
                 } else {
                     document.getElementById('countdownWeeks').innerText = '已完賽';
                 }
-            } else {
-                document.getElementById('countdownWeeks').innerText = '--';
             }
         }
 
-        // 設定每週目標跑量
+        // 依剩餘週數動態更新專屬課表建議
+        function updateTrainingSuggestions(weeks) {
+            const phaseLabel = document.getElementById('phaseLabel');
+            const lsdEl = document.getElementById('lsdSuggestion');
+            const intEl = document.getElementById('intervalSuggestion');
+
+            if (weeks >= 16.5 && weeks <= 17.9) {
+                // 倒數 17 週
+                phaseLabel.innerText = '倒數 17 週・基礎有氧與 T 配速閾值期';
+                lsdEl.innerText = '22 ~ 25 km (穩健累積長距離有氧耐力)';
+                intEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">2 × (5km T + 3min rest)</span> + <span class="text-amber-300 font-mono">60min E</span>';
+            } else if (weeks >= 15.5 && weeks < 16.5) {
+                // 倒數 16 週
+                phaseLabel.innerText = '倒數 16 週・閾值耐受與長距離擴張期';
+                lsdEl.innerText = '25 ~ 30 km (維持勻速巡航體感)';
+                intEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">4 × (3km T + 2min rest)</span> + <span class="text-amber-300 font-mono">30min E</span>';
+            } else if (weeks >= 14.5 && weeks < 15.5) {
+                // 倒數 15 週
+                phaseLabel.innerText = '倒數 15 週・長跑節奏化與高低速轉換';
+                lsdEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">4 × (3km T + 2min rest)</span> + <span class="text-amber-300 font-mono">40min E</span>';
+                intEl.innerHTML = '<span class="text-amber-300 font-mono">30min E</span> + <span class="text-yellow-400 font-mono font-bold">5 × (1km T + 400m 慢跑)</span> + <span class="text-amber-300 font-mono">30min E</span>';
+            } else if (weeks >= 13.5 && weeks < 14.5) {
+                // 倒數 14 週
+                phaseLabel.innerText = '倒數 14 週・馬拉松配速 (M) 專項模擬';
+                lsdEl.innerText = '30 km (大長跑耐力檢驗)';
+                intEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">15km M 配速 (4\'15")</span> + <span class="text-amber-300 font-mono">30min E</span>';
+            } else if (weeks >= 12.5 && weeks < 13.5) {
+                // 倒數 13 週
+                phaseLabel.innerText = '倒數 13 週・長跑調節與高容量 T 配速堆疊';
+                lsdEl.innerText = '20 ~ 25 km (跑量調節恢復)';
+                intEl.innerHTML = '<span class="text-amber-300 font-mono">20min E</span> + <span class="text-yellow-400 font-mono font-bold">4 × (3km T + 2min rest)</span> + <span class="text-amber-300 font-mono">60min E</span>';
+            } else if (weeks >= 11.5 && weeks < 12.5) {
+                // 倒數 12 週
+                phaseLabel.innerText = '倒數 12 週・專項 18km M 配速長距離挑戰';
+                lsdEl.innerHTML = '<span class="text-amber-300 font-mono">30min E</span> + <span class="text-yellow-400 font-mono font-bold">18km M 配速 (4\'15")</span> + <span class="text-amber-300 font-mono">30min E</span>';
+                intEl.innerHTML = '<span class="text-gray-400 italic">無安排傳統間歇（全力投注長跑專項質量與恢復）</span>';
+            } else if (weeks >= 10.5 && weeks < 11.5) {
+                // 倒數 11 週
+                phaseLabel.innerText = '倒數 11 週・35km 大長跑與深層乳酸耐受';
+                lsdEl.innerText = '30 ~ 35 km (全週期最高里程耐力抗疲勞)';
+                intEl.innerHTML = '<span class="text-amber-300 font-mono">60min E</span> + <span class="text-yellow-400 font-mono font-bold">4km T</span> + <span class="text-amber-300 font-mono">30min E</span> + <span class="text-yellow-400 font-mono font-bold">3km T</span> + <span class="text-amber-300 font-mono">10min E</span>';
+            } else if (weeks >= 9.5 && weeks < 10.5) {
+                // 倒數 10 週
+                phaseLabel.innerText = '倒數 10 週・半馬距離 20km M 配速專項考驗';
+                lsdEl.innerHTML = '<span class="text-amber-300 font-mono">30min E</span> + <span class="text-yellow-400 font-mono font-bold">20km M 配速 (4\'15")</span> + <span class="text-amber-300 font-mono">20min E</span>';
+                intEl.innerHTML = '<span class="text-gray-300 font-mono">可安排 8~10km 輕鬆跑或滾筒放鬆，專注於長跑體感吸收</span>';
+            } else if (weeks > 17.9) {
+                phaseLabel.innerText = '前期基礎打底期';
+                lsdEl.innerText = '20–22 km @ 4\'45"–5\'00"';
+                intEl.innerText = '1000m × 5 趟 @ 3\'45" (休 90s)';
+            } else if (weeks > 6) {
+                phaseLabel.innerText = '專項速耐力與配速進展期';
+                lsdEl.innerText = '28–32 km (後段漸速拉至 4\'15" M 配速)';
+                intEl.innerText = '5 km × 3 趟 @ 4\'10"–4\'15" (間歇模擬馬拉松體感)';
+            } else if (weeks > 3) {
+                phaseLabel.innerText = '巔峰衝刺與耐受期';
+                lsdEl.innerText = '30–34 km @ 4\'25"–4\'35" (最後大長跑耐力檢驗)';
+                intEl.innerText = '2000m × 4 趟 @ 3\'50"–3\'55" (維持高檔攝氧量)';
+            } else if (weeks > 0) {
+                phaseLabel.innerText = '賽前減量與超補償期';
+                lsdEl.innerText = '14–18 km @ 4\'40" (維持肌肉彈性，嚴防疲勞)';
+                intEl.innerText = '1000m × 3 趟 @ 4\'00" (找比賽節奏，維持體感)';
+            } else {
+                phaseLabel.innerText = '賽事週';
+                lsdEl.innerText = '賽前 5–8 km 輕鬆慢跑熱身';
+                intEl.innerText = '400m × 3 趟輕快開腿衝刺';
+            }
+        }
+
         function setWeeklyGoal() {
             const newGoal = prompt('請輸入每週目標跑量 (km):', weeklyGoal);
             if (newGoal && !isNaN(newGoal)) {
@@ -232,7 +317,6 @@
             }
         }
 
-        // 計算並更新本週跑量進度條
         function updateWeeklyProgress() {
             document.getElementById('targetWeeklyVolume').innerText = weeklyGoal;
             
@@ -263,10 +347,8 @@
             document.getElementById('weeklyProgressBar').style.width = `${percentage}%`;
         }
 
-        // 儲存訓練紀錄
         function saveLog(e) {
             e.preventDefault();
-            
             const newLog = {
                 id: Date.now(),
                 date: document.getElementById('runDate').value,
@@ -288,7 +370,6 @@
             renderLogs();
         }
 
-        // 渲染歷史日誌列表
         function renderLogs() {
             const tbody = document.getElementById('logTableBody');
             tbody.innerHTML = '';
@@ -317,7 +398,6 @@
             });
         }
 
-        // 刪除單筆紀錄
         function deleteLog(id) {
             if(confirm('確定要刪除這筆訓練紀錄嗎？')) {
                 runLogs = runLogs.filter(log => log.id !== id);
@@ -327,7 +407,6 @@
             }
         }
 
-        // 清除全部紀錄
         function clearAllLogs() {
             if(confirm('⚠️ 警告：這將會刪除所有的訓練歷史紀錄，且無法復原！確定嗎？')) {
                 runLogs = [];
