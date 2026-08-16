@@ -57,7 +57,7 @@
                         <div class="text-gray-200 mt-0.5 leading-relaxed" id="lsdSuggestion">--</div>
                     </div>
                     <div>
-                        <div class="text-rose-400 font-semibold flex items-center gap-1">⏱️ 間歇/重點訓練 (Interval/Key Workout)</div>
+                        <div class="text-rose-400 font-semibold flex items-center gap-1">⏱️ 間歇/重點訓練 (Key Workout)</div>
                         <div class="text-gray-200 mt-0.5 leading-relaxed" id="intervalSuggestion">--</div>
                     </div>
                 </div>
@@ -98,7 +98,7 @@
                         <select id="runType" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand">
                             <option value="輕鬆跑">E 輕鬆跑 (恢復體感)</option>
                             <option value="配速跑">M 配速跑 (體感 4'15")</option>
-                            <option value="間歇跑">I 間歇跑 (乳酸閾值/T配速)</option>
+                            <option value="間歇跑">I/T 間歇跑 (乳酸閾值/T配速)</option>
                             <option value="長距離(LSD)">LSD 長距離 (耐力累積)</option>
                             <option value="越野跑">T 越野跑 / 縱走 (核心肌群)</option>
                         </select>
@@ -239,7 +239,7 @@
             }
         }
 
-        // 依剩餘週數動態更新專屬課表建議
+        // 依剩餘週數動態更新 18 週專屬課表建議
         function updateTrainingSuggestions(weeks) {
             const phaseLabel = document.getElementById('phaseLabel');
             const lsdEl = document.getElementById('lsdSuggestion');
@@ -289,27 +289,60 @@
                 // 倒數 10 週
                 phaseLabel.innerText = '倒數 10 週・半馬距離 20km M 配速專項考驗';
                 lsdEl.innerHTML = '<span class="text-amber-300 font-mono">30min E</span> + <span class="text-yellow-400 font-mono font-bold">20km M 配速 (4\'15")</span> + <span class="text-amber-300 font-mono">20min E</span>';
-                intEl.innerHTML = '<span class="text-gray-300 font-mono">可安排 8~10km 輕鬆跑或滾筒放鬆，專注於長跑體感吸收</span>';
-            } else if (weeks > 18.9) {
+                intEl.innerHTML = '<span class="text-gray-300 font-mono">安排輕鬆跑或滾筒伸展，專注於長跑專項體感吸收</span>';
+            } else if (weeks >= 8.5 && weeks < 9.5) {
+                // 倒數 9 週
+                phaseLabel.innerText = '倒數 9 週・長跑結合 T 配速與多組閾值間歇';
+                lsdEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">4km T</span> + <span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">4km T</span> + <span class="text-amber-300 font-mono">40min E</span>';
+                intEl.innerHTML = '<span class="text-amber-300 font-mono">30min E</span> + <span class="text-yellow-400 font-mono font-bold">4 × (3km T + 2min rest)</span> + <span class="text-amber-300 font-mono">30min E</span>';
+            } else if (weeks >= 7.5 && weeks < 8.5) {
+                // 倒數 8 週
+                phaseLabel.innerText = '倒數 8 週・超長距離 35km 有氧巡航';
+                lsdEl.innerText = '30 ~ 35 km E (維持深層耐力儲備與脂肪供能)';
+                intEl.innerHTML = '<span class="text-gray-300">本週以累積純有氧大長跑為主，間歇可安排輕鬆慢跑調節</span>';
+            } else if (weeks >= 6.5 && weeks < 7.5) {
+                // 倒數 7 週
+                phaseLabel.innerText = '倒數 7 週・專項 20km M 配速與 2km 短間歇';
+                lsdEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">20km M 配速 (4\'15")</span>';
+                intEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">5 × (2km T + 2min rest)</span> + <span class="text-amber-300 font-mono">60min E</span>';
+            } else if (weeks >= 5.5 && weeks < 6.5) {
+                // 倒數 6 週
+                phaseLabel.innerText = '倒數 6 週・高密度 3km T 閾值強化';
+                lsdEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">4 × (3km T + 2min rest)</span> + <span class="text-amber-300 font-mono">10min E</span>';
+                intEl.innerHTML = '<span class="text-gray-300">專注長跑課表的高強度輸出，平日安排基礎有氧與肌力維持</span>';
+            } else if (weeks >= 4.5 && weeks < 5.5) {
+                // 倒數 5 週
+                phaseLabel.innerText = '倒數 5 週・最後大長跑與複合專項間歇';
+                lsdEl.innerText = '30 ~ 35 km E (全週期最後一趟超長距離耐力儲備)';
+                intEl.innerHTML = '<span class="text-amber-300 font-mono">20min E</span> + <span class="text-yellow-400 font-mono font-bold">10km M</span> + <span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">4km T</span> + <span class="text-amber-300 font-mono">10min E</span>';
+            } else if (weeks >= 3.5 && weeks < 4.5) {
+                // 倒數 4 週
+                phaseLabel.innerText = '倒數 4 週・金字塔階梯 T 配速巔峰考驗';
+                lsdEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">5km T</span> + <span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">4km T</span> + <span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">3km T</span>';
+                intEl.innerHTML = '<span class="text-gray-300">體感漸進衝刺，準備進入減量期</span>';
+            } else if (weeks >= 2.5 && weeks < 3.5) {
+                // 倒數 3 週
+                phaseLabel.innerText = '倒數 3 週・第一階段減量與專項體感固化';
+                lsdEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">20km M 配速 (4\'15")</span> + <span class="text-amber-300 font-mono">50min E</span>';
+                intEl.innerHTML = '<span class="text-amber-300 font-mono">10min E</span> + <span class="text-yellow-400 font-mono font-bold">4 × (2km T + 2min rest)</span> + <span class="text-amber-300 font-mono">60min E</span>';
+            } else if (weeks >= 1.5 && weeks < 2.5) {
+                // 倒數 2 週
+                phaseLabel.innerText = '倒數 2 週・第二階段深度減量與維持肌肉彈性';
+                lsdEl.innerHTML = '<span class="text-amber-300 font-mono">30min E</span> + <span class="text-yellow-400 font-mono font-bold">3 × (3km T + 2min rest)</span> + <span class="text-amber-300 font-mono">20min E</span>';
+                intEl.innerHTML = '<span class="text-gray-300">跑量大幅下修 40%，維持攝氧與神經肌肉刺激，避免疲勞</span>';
+            } else if (weeks > 0 && weeks < 1.5) {
+                // 最後一週 (賽事週)
+                phaseLabel.innerText = '賽事週・超補償與最後激勵';
+                lsdEl.innerText = '賽前 2~3 天 5~7 km 輕鬆跑 + 3~4 趟 100m 開腿快跑';
+                intEl.innerHTML = '<span class="text-amber-300 font-mono">20min E</span> + <span class="text-yellow-400 font-mono font-bold">3 × (2km T + 2min rest)</span> + <span class="text-amber-300 font-mono">10min E</span>';
+            } else if (weeks === 0) {
+                phaseLabel.innerText = '🔥 Race Day・台北馬拉松';
+                lsdEl.innerText = '42.195 km @ 4\'15"/km (穩健發揮，全力衝刺 Sub 3！)';
+                intEl.innerText = '相信 18 週扎實訓練的累積！';
+            } else {
                 phaseLabel.innerText = '前期體能打底期';
                 lsdEl.innerText = '18–20 km @ 4\'50"–5\'10"';
                 intEl.innerText = '輕鬆跑 + 核心肌群強化訓練';
-            } else if (weeks > 6) {
-                phaseLabel.innerText = '專項速耐力與配速進展期';
-                lsdEl.innerText = '28–32 km (後段漸速拉至 4\'15" M 配速)';
-                intEl.innerText = '5 km × 3 趟 @ 4\'10"–4\'15" (間歇模擬馬拉松體感)';
-            } else if (weeks > 3) {
-                phaseLabel.innerText = '巔峰衝刺與耐受期';
-                lsdEl.innerText = '30–34 km @ 4\'25"–4\'35" (最後大長跑耐力檢驗)';
-                intEl.innerText = '2000m × 4 趟 @ 3\'50"–3\'55" (維持高檔攝氧量)';
-            } else if (weeks > 0) {
-                phaseLabel.innerText = '賽前減量與超補償期';
-                lsdEl.innerText = '14–18 km @ 4\'40" (維持肌肉彈性，嚴防疲勞)';
-                intEl.innerText = '1000m × 3 趟 @ 4\'00" (找比賽節奏，維持體感)';
-            } else {
-                phaseLabel.innerText = '賽事週';
-                lsdEl.innerText = '賽前 5–8 km 輕鬆慢跑熱身';
-                intEl.innerText = '400m × 3 趟輕快開腿衝刺';
             }
         }
 
