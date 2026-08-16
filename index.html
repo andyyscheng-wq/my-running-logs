@@ -57,7 +57,7 @@
                         <div class="text-gray-200 mt-0.5 leading-relaxed" id="lsdSuggestion">--</div>
                     </div>
                     <div>
-                        <div class="text-rose-400 font-semibold flex items-center gap-1">⏱️ 間歇訓練 (Interval)</div>
+                        <div class="text-rose-400 font-semibold flex items-center gap-1">⏱️ 間歇/重點訓練 (Interval/Key Workout)</div>
                         <div class="text-gray-200 mt-0.5 leading-relaxed" id="intervalSuggestion">--</div>
                     </div>
                 </div>
@@ -245,7 +245,12 @@
             const lsdEl = document.getElementById('lsdSuggestion');
             const intEl = document.getElementById('intervalSuggestion');
 
-            if (weeks >= 16.5 && weeks <= 17.9) {
+            if (weeks >= 17.5 && weeks <= 18.9) {
+                // 倒數 18 週
+                phaseLabel.innerText = '倒數 18 週・基礎奠定與前期有氧打底';
+                lsdEl.innerText = '21 ~ 25 km (穩健累積有氧基礎與跑動經濟性)';
+                intEl.innerHTML = '<span class="text-gray-300">本週以基礎有氧與核心穩定為主，可安排輕鬆跑搭配 6~8 趟 100m 輕快跑 (Strides)</span>';
+            } else if (weeks >= 16.5 && weeks < 17.5) {
                 // 倒數 17 週
                 phaseLabel.innerText = '倒數 17 週・基礎有氧與 T 配速閾值期';
                 lsdEl.innerText = '22 ~ 25 km (穩健累積長距離有氧耐力)';
@@ -285,10 +290,10 @@
                 phaseLabel.innerText = '倒數 10 週・半馬距離 20km M 配速專項考驗';
                 lsdEl.innerHTML = '<span class="text-amber-300 font-mono">30min E</span> + <span class="text-yellow-400 font-mono font-bold">20km M 配速 (4\'15")</span> + <span class="text-amber-300 font-mono">20min E</span>';
                 intEl.innerHTML = '<span class="text-gray-300 font-mono">可安排 8~10km 輕鬆跑或滾筒放鬆，專注於長跑體感吸收</span>';
-            } else if (weeks > 17.9) {
-                phaseLabel.innerText = '前期基礎打底期';
-                lsdEl.innerText = '20–22 km @ 4\'45"–5\'00"';
-                intEl.innerText = '1000m × 5 趟 @ 3\'45" (休 90s)';
+            } else if (weeks > 18.9) {
+                phaseLabel.innerText = '前期體能打底期';
+                lsdEl.innerText = '18–20 km @ 4\'50"–5\'10"';
+                intEl.innerText = '輕鬆跑 + 核心肌群強化訓練';
             } else if (weeks > 6) {
                 phaseLabel.innerText = '專項速耐力與配速進展期';
                 lsdEl.innerText = '28–32 km (後段漸速拉至 4\'15" M 配速)';
